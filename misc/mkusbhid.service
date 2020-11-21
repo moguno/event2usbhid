@@ -1,0 +1,12 @@
+[Unit]
+Description=Event Device 2 USB HID Initializer
+After=network.target
+
+[Service]
+ExecStart=/opt/event2usbhid/bin/mkusbhid
+Type=oneshot
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,3 @@
+KERNEL=="event*", ATTRS{name}=="Microsoft Wedge Mobile Keyboard", TAG+="systemd", SYMLINK+="input/keyboard", ENV{SYSTEMD_ALIAS}="/sys/class/input/keyboard"
+
+KERNEL=="event*", ATTRS{name}=="Microsoft Sculpt Comfort Mouse", TAG+="systemd", SYMLINK+="input/mouse", ENV{SYSTEMD_ALIAS}="/sys/class/input/mouse"      

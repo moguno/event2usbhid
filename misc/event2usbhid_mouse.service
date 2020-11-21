@@ -1,0 +1,16 @@
+[Unit]
+Description=Mouse Event Device to USB HID
+After=network.target
+BindsTo=sys-class-input-mouse.device
+After=sys-class-input-mouse.device
+Requires=mkusbhid.service
+
+[Service]
+ExecStart=/bin/sh -c "/opt/event2usbhid/bin/event2usbhid mouse < /dev/input/mouse > /dev/hidg1"
+Restart=always
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=sys-class-input-mouse.device
+WantedBy=multi-user.target
