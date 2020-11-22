@@ -79,6 +79,9 @@ usbg_enable_gadget() {
 	ls /sys/class/udc > UDC
 }
 
+/sbin/modprobe dwc2
+/sbin/modprobe libcomposite
+
 state=`usbg_init "/sys/kernel/config/"`
 
 declare -A g_attrs
