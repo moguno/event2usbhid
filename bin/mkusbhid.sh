@@ -1,5 +1,84 @@
 #! /bin/bash
 
+usbg_init() {
+	base=$1
+
+	mkdir -p $base/usb_gadget
+
+	echo $base/usb_gadget
+}
+
+usbg_create_gadget() {
+	state=$1
+	gadget=$2
+	declare -n _g_attrs=$3
+	declare -n _g_strs=$4
+
+	mkdir -p $state/$gadget
+	cd $state/$gadget
+
+	for key in "${!_g_attrs[@]}"; do
+		echo -ne ${_g_attrs[$key]} > $key
+	done
+
+	mkdir $state/$gadget/strings/0x409
+	cd $state/$gadget/strings/0x409
+
+	for key in "${!_g_strs[@]}"; do
+		echo -ne ${_g_strs[$key]} > $key
+	done
+
+	echo $state/$gadget
+}
+
+usbg_create_function() {
+	gadget=$1
+	function=$2
+	function_id=$3
+	declare -n _f_attrs=$4
+
+	mkdir -p $gadget/functions/$function.$function_id
+	cd $gadget/functions/$function.$function_id
+
+	for key in "${!_f_attrs[@]}"; do
+		echo -ne ${_f_attrs[$key]} > $key
+	done
+
+	echo $gadget/functions/$function.$function_id
+}
+
+usbg_create_config() {
+	gadget=$1
+	config_id=$2
+	config=$3
+	declare -n _c_strs=$4
+
+	mkdir -p $gadget/configs/$config.$config_id/strings/0x409
+	cd $gadget/configs/$config.$config_id/strings/0x409
+
+	for key in "${!_c_strs[@]}"; do
+		echo -ne ${_c_strs[$key]} > $key
+	done
+
+	echo $gadget/configs/$config.$config_id
+}
+
+usbg_add_config_function() {
+	config=$1
+	name=$2
+	function=$3
+
+	ln -s $function $config/$name
+}
+
+usbg_enable_gadget() {
+	gadget=$1
+
+	cd $gadget
+
+	ls /sys/class/udc > UDC
+}
+
 declare -A g_attrs
 g_attrs["bcdUSB"]="0x0200"
 g_attrs["bDeviceClass"]="0x00"
@@ -21,7 +100,6 @@ c_strs["configuration"]="1xHID"
 declare -A report_desc_keyboard
 
 desc=""
-
 desc+="\x05""\x01" # USAGE_PAGE (Generic Desktop)
 desc+="\x09""\x06" # USAGE (Keyboard)
 desc+="\xA1""\x01" # COLLECTION (Application)
@@ -108,43 +186,13 @@ f_attrs_keyboard["report_desc"]=$desc
 f_attrs_keyboard["report_length"]="16"
 f_attrs_keyboard["subclass"]="0"
 
-BASE=/sys/kernel/config/usb_gadget/
-GADGET=$BASE/g9
+state=`usbg_init "/sys/kernel/config/"`
+gadget=`usbg_create_gadget $state "g11" g_attrs g_strs`
+f_hid_keyboard=`usbg_create_function $gadget "hid" "usb0" f_attrs_keyboard`
+config=`usbg_create_config $gadget "1" "config" c_strs`
 
-mkdir -p $GADGET
-cd $GADGET
+usbg_add_config_function $config "keyboard" $f_hid_keyboard
 
-for key in "${!g_attrs[@]}"; do
-	echo -ne ${g_attrs[$key]} > $key
-done
+usbg_enable_gadget $gadget
 
-GADGET_STRING=$GADGET/strings/0x409
-
-mkdir $GADGET_STRING
-cd $GADGET_STRING
-
-for key in "${!g_strs[@]}"; do
-	echo -ne ${g_strs[$key]} > $key
-done
-
-FUNCTION_BASE=$GADGET/functions
-FUNCTION=$FUNCTION_BASE/hid.usb0
-CONFIG_BASE=$GADGET/configs
-CONFIG=$CONFIG_BASE/config.1
-CONFIG_STRING=$CONFIG/strings/0x409
-
-mkdir -p $FUNCTION
-cd $FUNCTION
-
-for key in "${!f_attrs_keyboard[@]}"; do
-	echo -ne ${f_attrs_keyboard[$key]} > $key
-done
-
-mkdir -p $CONFIG_STRING
-cd $CONFIG_STRING
-
-for key in "${!c_strs[@]}"; do
-	echo -ne ${c_strs[$key]} > $key
-done
-
-ln -s $FUNCTION $CONFIG/keyboard
+exit
