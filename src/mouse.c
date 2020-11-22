@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <memory.h>
-#include "gadget-hid.h"
 
 /**
  * @fn
@@ -28,14 +27,14 @@ void getMouseEvent(struct input_event *event) {
  * @param wheel ホイールの移動量
  */
 void sendMouseReport(int buttons, int x, int y, int wheel){
-	unsigned char buf[MOUSE_REPORT_SIZE + 1];
+	unsigned char buf[5];
 	buf[0] = 3;
 	buf[1] = buttons;
 	buf[2] = x;
 	buf[3] = y;
 	buf[4] = wheel;
 
-	write(1, buf, MOUSE_REPORT_SIZE + 1);
+	write(1, buf, sizeof(buf));
 }
 
 

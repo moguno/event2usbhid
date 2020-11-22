@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <memory.h>
-#include "gadget-hid.h"
 
 
 //! eventファイル→USB HIDのキーコード変換表
@@ -116,7 +115,7 @@ void sendKeyboardHIDReport(char modifiers, unsigned short *pressed_keys){
 		buf[x] = pressed_keys[x - 3];
 	}
 
-	write(1, buf, HID_REPORT_SIZE);
+	write(1, buf, sizeof(buf));
 }
 
 
