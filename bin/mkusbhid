@@ -79,6 +79,8 @@ usbg_enable_gadget() {
 	ls /sys/class/udc > UDC
 }
 
+state=`usbg_init "/sys/kernel/config/"`
+
 declare -A g_attrs
 g_attrs["bcdUSB"]="0x0200"
 g_attrs["bDeviceClass"]="0x00"
@@ -94,10 +96,7 @@ g_strs["serialnumber"]="0123456789"
 g_strs["manufacturer"]="moguno"
 g_strs["product"]="HID Converter"
 
-declare -A c_strs
-c_strs["configuration"]="1xHID"
-
-declare -A report_desc_keyboard
+gadget=`usbg_create_gadget $state "g11" g_attrs g_strs`
 
 desc=""
 desc+="\x05""\x01" # USAGE_PAGE (Generic Desktop)
@@ -186,12 +185,53 @@ f_attrs_keyboard["report_desc"]=$desc
 f_attrs_keyboard["report_length"]="16"
 f_attrs_keyboard["subclass"]="0"
 
-state=`usbg_init "/sys/kernel/config/"`
-gadget=`usbg_create_gadget $state "g11" g_attrs g_strs`
 f_hid_keyboard=`usbg_create_function $gadget "hid" "usb0" f_attrs_keyboard`
+
+desc=""
+desc+="\x05""\x01" # USAGE_PAGE (Generic Desktop)
+desc+="\x09""\x02" # USAGE (Mouse)
+desc+="\xA1""\x01" # COLLECTION (Application)
+desc+="\x09""\x01" #   USAGE (Pointer)
+desc+="\xA1""\x00" #   COLLECTION (Physical)
+desc+="\x85""\x03" #     Report ID (3)
+desc+="\x05""\x09" #     USAGE_PAGE (Button)
+desc+="\x19""\x01" #     USAGE_MINIMUM (Button 1)
+desc+="\x29""\x03" #     USAGE_MAXIMUM (Button 3)
+desc+="\x15""\x00" #     LOGICAL_MINIMUM (0)
+desc+="\x25""\x01" #     LOGICAL_MAXIMUM (1)
+desc+="\x95""\x03" #     REPORT_COUNT (3)
+desc+="\x75""\x01" #     REPORT_SIZE (1)
+desc+="\x81""\x02" #     INPUT (Data,Var,Abs)
+desc+="\x95""\x01" #     REPORT_COUNT (1)
+desc+="\x75""\x05" #     REPORT_SIZE (5)
+desc+="\x81""\x03" #     INPUT (Cnst,Var,Abs)
+desc+="\x05""\x01" #     USAGE_PAGE (Generic Desktop)
+desc+="\x09""\x30" #     USAGE (X)
+desc+="\x09""\x31" #     USAGE (Y)
+desc+="\x09""\x38" #     USAGE (WHEEL)
+desc+="\x15""\x81" #     LOGICAL_MINIMUM (-127)
+desc+="\x25""\x7F" #     LOGICAL_MAXIMUM (127)
+desc+="\x75""\x08" #     REPORT_SIZE (8)
+desc+="\x95""\x03" #     REPORT_COUNT (3)
+desc+="\x81""\x06" #     INPUT (Data,Var,Rel)
+desc+="\xC0"       #   END_COLLECTION
+desc+="\xC0"       # END_COLLECTION
+
+declare -A f_attrs_mouse
+f_attrs_mouse["protocol"]="2"
+f_attrs_mouse["report_desc"]=$desc
+f_attrs_mouse["report_length"]="16"
+f_attrs_mouse["subclass"]="0"
+
+f_hid_mouse=`usbg_create_function $gadget "hid" "usb1" f_attrs_mouse`
+
+declare -A c_strs
+c_strs["configuration"]="2xHID"
+
 config=`usbg_create_config $gadget "1" "config" c_strs`
 
 usbg_add_config_function $config "keyboard" $f_hid_keyboard
+usbg_add_config_function $config "mouse" $f_hid_mouse
 
 usbg_enable_gadget $gadget
 
