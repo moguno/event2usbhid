@@ -9,7 +9,7 @@ void mouse();
  * @fn
  * 使い方表示
  *
- * @param exe_name 実行可能ファイルのファイル名
+ * @param[in] exe_name 実行可能ファイルのファイル名
  */
 void usage(char *exe_name) {
 	fprintf(stderr, "Usage: %s [keyboard|mouse] < /dev/input/eventN > /dev/hidgN\n", exe_name);
@@ -20,8 +20,8 @@ void usage(char *exe_name) {
  * @fn
  * メイン処理
  *
- * @param コマンドライン引数の数
- * @param コマンドライン引数
+ * @param[in] コマンドライン引数の数
+ * @param[in] コマンドライン引数
  *
  * @return 0:正常終了、1:エラー終了
  */

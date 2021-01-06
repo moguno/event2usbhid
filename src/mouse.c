@@ -10,7 +10,7 @@
  * @fn
  * /dev/input/eventNからイベントを読み込む
  *
- * @param 読み込んだイベントを書き込むポインタ
+ * @param[out] event 読み込んだイベントを書き込むポインタ
  */
 void getMouseEvent(struct input_event *event) {
 	read(0, event, sizeof(*event));
@@ -21,10 +21,10 @@ void getMouseEvent(struct input_event *event) {
  * @fn
  * libcompositeにマウスイベントを書き込む
  * 
- * @param buttons マウスボタンの押され具合
- * @param x X座標の移動量
- * @param y Y座標の移動量
- * @param wheel ホイールの移動量
+ * @param[in] buttons マウスボタンの押され具合
+ * @param[in] x X座標の移動量
+ * @param[in] y Y座標の移動量
+ * @param[in] wheel ホイールの移動量
  */
 void sendMouseReport(int buttons, int x, int y, int wheel){
 	unsigned char buf[5];
