@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
+// プロトタイプ宣言
 void keyboard();
 void mouse();
 
 
 /**
  * @fn
- * 使い方表示
+ * @brief 使い方表示
  *
  * @param[in] exe_name 実行可能ファイルのファイル名
  */
@@ -18,7 +19,7 @@ void usage(char *exe_name) {
 
 /**
  * @fn
- * メイン処理
+ * @brief メイン処理
  *
  * @param[in] コマンドライン引数の数
  * @param[in] コマンドライン引数

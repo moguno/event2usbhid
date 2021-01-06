@@ -27,7 +27,7 @@ unsigned short linux_to_usb[] = {
 
 /**
  * @fn
- * /dev/input/eventNからイベントを読み込む
+ * @brief /dev/input/eventNからイベントを読み込む
  *
  * @param[out] event 読み込んだイベントを書き込むポインタ
  */
@@ -54,7 +54,7 @@ void getKeyboardEvent(struct input_event *event) {
 
 /**
  * @fn
- * キーを離した時の処理
+ * @brief キーを離した時の処理
  *
  * @param[in] hid_code 離したUSB HIDのキーコード
  * @param[in,out] pressed_keys 押しているキーの配列
@@ -77,7 +77,7 @@ int releaseKey(unsigned short hid_code, unsigned short *pressed_keys){
 
 /**
  * @fn
- * キーを押したときの処理
+ * @brief キーを押したときの処理
  *
  * @param[in] hid_code 押したUSB HIDのキーコード
  * @param[in,out] pressed_keys 押しているキーの配列
@@ -96,7 +96,7 @@ void pressKey(unsigned short hid_code, unsigned short *pressed_keys){
 
 /**
  * @fn
- * libcompositeにキーボードイベントを書き込む
+ * @brief libcompositeにキーボードイベントを書き込む
  * 
  * @param[in] modifiers CTRLとかSHIFTとかの押され具合
  * @param[in] pressed_keys 押しているキーの配列
@@ -121,7 +121,7 @@ void sendKeyboardHIDReport(char modifiers, unsigned short *pressed_keys){
 
 /**
  * @fn
- * キーボード変換処理
+ * @brief キーボード変換処理
  */
 void keyboard() {
 	unsigned short pressed_keys[14];
